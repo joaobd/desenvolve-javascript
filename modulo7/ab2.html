@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lista de Tarefas</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+        }
+        .tarefa {
+            display: flex;
+            align-items: center;
+            margin: 5px 0;
+        }
+        .tarefa label {
+            margin-left: 10px;
+        }
+        .tarefa button {
+            margin-left: 10px;
+        }
+        .concluida {
+            text-decoration: line-through;
+            color: green;
+        }
+        .nao-concluida {
+            color: red;
+        }
+    </style>
+</head>
+<body>
+    <h1>Lista de Tarefas</h1>
+    <input type="text" id="descricao-tarefa" placeholder="Digite a descrição da tarefa">
+    <button type="button" id="botao-adicionar">Adicionar</button>
+    <div id="lista-tarefas"></div>
+
+    <script>
+        let tarefas = JSON.parse(localStorage.getItem('tarefas')) || [];
+
+        document.getElementById('botao-adicionar').addEventListener('click', () => {
+            const descricao = document.getElementById('descricao-tarefa').value.trim();
+            if (descricao && !tarefas.some(tarefa => tarefa.descricao === descricao)) {
+                const novaTarefa = { descricao, status: false };
+                tarefas.push(novaTarefa);
+                localStorage.setItem('tarefas', JSON.stringify(tarefas));
+                atualizarListaTarefas();
+                document.getElementById('descricao-tarefa').value = ''; // Limpa o campo de texto
+            }
+        });
+
+        function atualizarListaTarefas() {
+            const listaTarefas = document.getElementById('lista-tarefas');
+            listaTarefas.innerHTML = '';
+
+            tarefas.forEach((tarefa, index) => {
+                const tarefaDiv = document.createElement('div');
+                tarefaDiv.className = 'tarefa';
+
+                const checkbox = document.createElement('input');
+                checkbox.type = 'checkbox';
+                checkbox.checked = tarefa.status;
+                checkbox.addEventListener('change', () => {
+                    tarefas[index].status = checkbox.checked;
+                    localStorage.setItem('tarefas', JSON.stringify(tarefas));
+                    atualizarListaTarefas();
+                });
+
+                const label = document.createElement('label');
+                label.innerText = tarefa.descricao;
+                label.className = tarefa.status ? 'concluida' : 'nao-concluida';
+
+                const botaoRemover = document.createElement('button');
+                botaoRemover.innerText = 'Remover';
+                botaoRemover.addEventListener('click', () => {
+                    tarefas.splice(index, 1);
+                    localStorage.setItem('tarefas', JSON.stringify(tarefas));
+                    atualizarListaTarefas();
+                });
+
+                tarefaDiv.appendChild(checkbox);
+                tarefaDiv.appendChild(label);
+                tarefaDiv.appendChild(botaoRemover);
+                listaTarefas.appendChild(tarefaDiv);
+            });
+        }
+
+        // Atualizar a lista de tarefas ao carregar a página
+        atualizarListaTarefas();
+    </script>
+</body>
+</html>
