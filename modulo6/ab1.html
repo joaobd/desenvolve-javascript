@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Manipulação do DOM</title>
+    <style>
+        .estilo-lista {
+            color: blue;
+            font-weight: bold;
+        }
+        .classe-paragrafo {
+            font-style: italic;
+            color: green;
+        }
+    </style>
+</head>
+<body>
+    <h1 id="titulo">Título Original</h1>
+    <ul id="minha-lista">
+        <li>Item 1</li>
+        <li>Item 2</li>
+        <li>Item 3</li>
+    </ul>
+    <p>Parágrafo 1</p>
+    <p>Parágrafo 2</p>
+    <p>Parágrafo 3</p>
+    <button id="meu-botao">OFF</button>
+
+    <script>
+        // Mudar o texto do título
+        document.getElementById('titulo').innerText = 'Título Modificado';
+
+        // Alterar o estilo dos itens da lista
+        const itensDaLista = document.querySelectorAll('#minha-lista li');
+        itensDaLista.forEach(item => {
+            item.classList.add('estilo-lista');
+        });
+
+        // Adicionar uma classe a todos os parágrafos
+        const paragrafos = document.querySelectorAll('p');
+        paragrafos.forEach(paragrafo => {
+            paragrafo.classList.add('classe-paragrafo');
+        });
+
+        // Alterar o texto do botão
+        document.getElementById('meu-botao').innerText = 'ON';
+    </script>
+</body>
+</html>
