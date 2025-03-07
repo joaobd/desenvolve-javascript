@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Feed de Rede Social</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+        }
+        #form-postagem {
+            position: fixed;
+            top: 0;
+            width: 100%;
+            background-color: #f9f9f9;
+            padding: 10px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+        #lista-postagens {
+            margin-top: 100px; /* Ajustar conforme necessário para espaço do formulário fixo */
+        }
+        .postagem {
+            border: 1px solid #ddd;
+            padding: 10px;
+            margin-bottom: 10px;
+        }
+        .postagem img {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+        }
+        .postagem .avatar {
+            display: inline-block;
+            vertical-align: top;
+        }
+        .postagem .conteudo {
+            display: inline-block;
+            vertical-align: top;
+            margin-left: 10px;
+        }
+        .curtir {
+            margin-top: 10px;
+            display: block;
+        }
+    </style>
+</head>
+<body>
+    <div id="form-postagem">
+        <textarea id="texto-postagem" placeholder="O que você está pensando?" rows="3" cols="50"></textarea>
+        <button type="button" id="botao-postar">Postar</button>
+    </div>
+    <div id="lista-postagens"></div>
+
+    <script>
+        const postagens = JSON.parse(localStorage.getItem('postagens')) || [];
+
+        document.getElementById('botao-postar').addEventListener('click', async () => {
+            const texto = document.getElementById('texto-postagem').value.trim();
+            if (texto) {
+                const novaPostagem = {
+                    data: new Date(),
+                    nomeUsuario: 'SeuNomeDeUsuario',
+                    avatar: 'https://via.placeholder.com/50', // substitua pelo seu avatar
+                    texto,
+                    imagemGato: await buscarImagemGato(),
+                    likes: 0
+                };
+                postagens.unshift(novaPostagem);
+                localStorage.setItem('postagens', JSON.stringify(postagens));
+                atualizarListaPostagens();
+                document.getElementById('texto-postagem').value = ''; // Limpa a textarea
+            }
+        });
+
+        async function buscarImagemGato() {
+            const response = await fetch('https://api.thecatapi.com/v1/images/search');
+            const data = await response.json();
+            return data[0].url;
+        }
+
+        function atualizarListaPostagens() {
+            const listaPostagens = document.getElementById('lista-postagens');
+            listaPostagens.innerHTML = '';
+
+            postagens.forEach((postagem, index) => {
+                const postagemDiv = document.createElement('div');
+                postagemDiv.className = 'postagem';
+
+                const avatar = document.createElement('img');
+                avatar.src = postagem.avatar;
+                avatar.alt = postagem.nomeUsuario;
+
+                const nomeUsuario = document.createElement('p');
+                nomeUsuario.innerText = postagem.nomeUsuario;
+
+                const texto = document.createElement('p');
+                texto.innerText = postagem.texto;
+
+                const imagemGato = document.createElement('img');
+                imagemGato.src = postagem.imagemGato;
+                imagemGato.alt = 'Imagem de gatinho';
+
+                const likes = document.createElement('span');
+                likes.innerText = `Likes: ${postagem.likes}`;
+
+                const botaoCurtir = document.createElement('button');
+                botaoCurtir.innerText = 'Curtir';
+                botaoCurtir.className = 'curtir';
+                botaoCurtir.addEventListener('click', () => {
+                    postagem.likes += 1;
+                    localStorage.setItem('postagens', JSON.stringify(postagens));
+                    atualizarListaPostagens();
+                });
+
+                postagemDiv.appendChild(avatar);
+                postagemDiv.appendChild(nomeUsuario);
+                postagemDiv.appendChild(texto);
+                postagemDiv.appendChild(imagemGato);
+                postagemDiv.appendChild(likes);
+                postagemDiv.appendChild(botaoCurtir);
+
+                listaPostagens.appendChild(postagemDiv);
+            });
+        }
+
+        // Atualizar a lista de postagens ao carregar a página
+        atualizarListaPostagens();
+    </script>
+</body>
+</html>
